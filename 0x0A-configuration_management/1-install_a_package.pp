@@ -6,5 +6,5 @@ package { 'flask':
 package { 'werkzeug':
   ensure   => '2.1.1',
   provider => 'pip3',
-  require  => Package['flask'], # Ensure Flask is installed first
+  require  => Package['flask'],
 }
