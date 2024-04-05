@@ -1,4 +1,23 @@
 #!/usr/bin/env bash
-#Ubuntu container’s Nginx installation from listening on port 80
-sed -i 's/8080/80/g' /etc/nginx/sites-enabled/default
-service nginx restart
+# Script to configure Ubuntu's Nginx installation to listen on port 80
+
+if ! systemctl is-active --quiet nginx; then
+    echo "Nginx is not running"
+    exit 1
+fi
+
+sudo sed -i 's/listen 8080;/listen 80;/g' /etc/nginx/sites-enabled/default
+
+if [ $? -ne 0 ]; then
+    echo "Failed to update Nginx configuration"
+    exit 1
+fi
+
+sudo systemctl restart nginx
+
+if ! netstat -tnl | grep ':80 ' > /dev/null; then
+    echo "Nginx failed to listen on port 80"
+    exit 1
+fi
+
+echo "Nginx is now configured to listen on port 80"
