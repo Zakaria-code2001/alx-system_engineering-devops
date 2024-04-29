@@ -3,15 +3,13 @@
 gather employee data from API
 """
 
-import re
 import requests
-import sys
 
 
 def fetch_employee_todo_list(employee_id):
     # API URL to fetch employee TODO list information
-    url = (f"https://jsonplaceholder.typicode.com/todos/"
-           f"{employee_id}")
+    url = (f"https://jsonplaceholder.typicode.com/"
+           f"users/{employee_id}/todos")
 
     # Fetch data from the API
     response = requests.get(url)
@@ -19,20 +17,22 @@ def fetch_employee_todo_list(employee_id):
     # Check if request was successful
     if response.status_code == 200:
         data = response.json()
-        employee_name = data.get('name', 'Unknown')
+        # Fetching employee name from the first todo item
+        employee_name = data[0].get('username',
+                                    'Unknown')
         total_tasks = len(data)
-        completed_tasks = [task for task in data if
-                           task['completed']]
+        completed_tasks = [task for task in data
+                           if task['completed']]
         num_completed_tasks = len(completed_tasks)
 
         # Display information
-        print(f"Employee {employee_name} is done with"
-              f" tasks ({num_completed_tasks}/{total_tasks}):")
+        print(f"Employee {employee_name} is "
+              f"done with tasks ({num_completed_tasks}/{total_tasks}):")
         for task in completed_tasks:
             print(f"\t{task['title']}")
     else:
-        print(f"Failed to fetch TODO list"
-              f" for employee {employee_id}")
+        print(f"Failed to fetch TODO list for employee {employee_id}")
 
 
-fetch_employee_todo_list(1)
+# Test the function with employee ID 2
+fetch_employee_todo_list(2)
