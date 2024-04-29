@@ -1,44 +1,30 @@
 #!/usr/bin/python3
-"""
-gather employee data from API
-"""
+"""For a given employee ID, returns information about
+their TODO list progress"""
 
 import requests
+import sys
 
+if __name__ == "__main__":
 
-def fetch_employee_todo_list(employee_id):
-    # API URL to fetch employee TODO list information
-    url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
+    userId = sys.argv[1]
+    user = requests.get("https://jsonplaceholder.typicode.com/users/{}"
+                        .format(userId))
 
-    # Fetch data from the API
-    response = requests.get(url)
+    name = user.json().get('name')
 
-    # Check if request was successful
-    if response.status_code == 200:
-        user_data = response.json()
-        employee_name = user_data.get('name', 'Unknown')
-    else:
-        print(f"Failed to fetch user data for employee {employee_id}")
-        return
+    todos = requests.get('https://jsonplaceholder.typicode.com/todos')
+    totalTasks = 0
+    completed = 0
 
-    # Fetch employee's todo list
-    todo_url = f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
-    todo_response = requests.get(todo_url)
+    for task in todos.json():
+        if task.get('userId') == int(userId):
+            totalTasks += 1
+            if task.get('completed'):
+                completed += 1
 
-    # Check if todo request was successful
-    if todo_response.status_code == 200:
-        todos = todo_response.json()
-        completed_tasks = [task for task in todos if task['completed']]
-        num_completed_tasks = len(completed_tasks)
-        total_tasks = len(todos)
+    print('Employee {} is done with tasks({}/{}):'
+          .format(name, completed, totalTasks))
 
-        # Display information
-        print(f"Employee {employee_name} is done with tasks ({num_completed_tasks}/{total_tasks}):")
-        for task in completed_tasks:
-            print(f"\t{task['title']}")
-    else:
-        print(f"Failed to fetch TODO list for employee {employee_id}")
-
-
-# Test the function with employee ID 2
-fetch_employee_todo_list(2)
+    print('\n'.join(["\t " + task.get('title') for task in todos.json()
+          if task.get('userId') == int(userId) and task.get('completed')]))
