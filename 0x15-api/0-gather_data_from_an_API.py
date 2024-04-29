@@ -7,25 +7,26 @@ import re
 import requests
 import sys
 
-REST_API = "https://jsonplaceholder.typicode.com"
+def fetch_employee_todo_list(employee_id):
+    # API URL to fetch employee TODO list information
+    url = f"https://jsonplaceholder.typicode.com/todos/{employee_id}"
 
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        if re.fullmatch(r'\d+', sys.argv[1]):
-            id = int(sys.argv[1])
-            req = requests.get('{}/users/{}'.format(REST_API, id)).json()
-            task_req = requests.get('{}/todos'.format(REST_API)).json()
-            emp_name = req.get('name')
-            tasks = list(filter(lambda x: x.get('userId') == id, task_req))
-            completed_tasks = list(filter(lambda x: x.get('completed'), tasks))
-            print(
-                'Employee {} is done with tasks({}/{}):'.format(
-                    emp_name,
-                    len(completed_tasks),
-                    len(tasks)
-                )
-            )
-            if len(completed_tasks) > 0:
-                for task in completed_tasks:
-                    print('\t{}'.format(task.get('title')))
+    # Fetch data from the API
+    response = requests.get(url)
 
+    # Check if request was successful
+    if response.status_code == 200:
+        data = response.json()
+        employee_name = data.get('name', 'Unknown')
+        total_tasks = len(data)
+        completed_tasks = [task for task in data if task['completed']]
+        num_completed_tasks = len(completed_tasks)
+
+        # Display information
+        print(f"Employee {employee_name} is done with tasks ({num_completed_tasks}/{total_tasks}):")
+        for task in completed_tasks:
+            print(f"\t{task['title']}")
+    else:
+        print(f"Failed to fetch TODO list for employee {employee_id}")
+
+fetch_employee_todo_list(1)
