@@ -21,4 +21,4 @@ def top_ten(subreddit):
             title = post.get('data').get('title')
             print(title)
     elif (not response.ok):
-        return 0
+        return print(None)
