@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-"""Module for task 0"""
+"""Module for task 0 advanced API"""
 import requests
 import sys
 
