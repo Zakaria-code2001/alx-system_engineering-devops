@@ -7,7 +7,7 @@ import sys
 def top_ten(subreddit):
     """
     function that queries the Reddit API and
-    returns the number of subscribers
+    returns 10 titles
     """
 
     url = f"https://www.reddit.com/r/{subreddit}/hot.json?limit=10"
