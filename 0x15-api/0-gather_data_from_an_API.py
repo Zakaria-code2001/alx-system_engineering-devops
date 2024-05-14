@@ -1,32 +1,31 @@
 #!/usr/bin/python3
-'''
-gather employee data from API
-'''
+"""
+For a given employee ID, returns information about
+"""
 
-import re
 import requests
 import sys
 
-def fetch_employee_todo_list(employee_id):
-    # API URL to fetch employee TODO list information
-    url = f"https://jsonplaceholder.typicode.com/todos/{employee_id}"
+if __name__ == "__main__":
 
-    # Fetch data from the API
-    response = requests.get(url)
+    userId = sys.argv[1]
+    user = requests.get("https://jsonplaceholder.typicode.com/users/{}"
+                        .format(userId))
 
-    # Check if request was successful
-    if response.status_code == 200:
-        data = response.json()
-        employee_name = data.get('name', 'Unknown')
-        total_tasks = len(data)
-        completed_tasks = [task for task in data if task['completed']]
-        num_completed_tasks = len(completed_tasks)
+    name = user.json().get('name')
 
-        # Display information
-        print(f"Employee {employee_name} is done with tasks ({num_completed_tasks}/{total_tasks}):")
-        for task in completed_tasks:
-            print(f"\t{task['title']}")
-    else:
-        print(f"Failed to fetch TODO list for employee {employee_id}")
+    todos = requests.get('https://jsonplaceholder.typicode.com/todos')
+    totalTasks = 0
+    completed = 0
 
-fetch_employee_todo_list(1)
+    for task in todos.json():
+        if task.get('userId') == int(userId):
+            totalTasks += 1
+            if task.get('completed'):
+                completed += 1
+
+    print('Employee {} is done with tasks({}/{}):'
+          .format(name, completed, totalTasks))
+
+    print('\n'.join(["\t " + task.get('title') for task in todos.json()
+          if task.get('userId') == int(userId) and task.get('completed')]))
